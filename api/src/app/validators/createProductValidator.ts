@@ -1,24 +1,37 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { CreateProductItens } from '../types/CreateProductItens';
+import { CreateProductItems } from '../types/CreateProductItems';
 import { validateObjectId } from './generalValidator';
 
-export function createProductValidator(itens: CreateProductItens) {
-  const iterableItens: { key: string; value: any }[] = [];
+/**
+ * Function responsible for validating the creation items of a product.
+ * @param items Items for product creation to be validated
+ * @returns Valited items or a exception if validation fails
+ */
+export function createProductValidator(items: CreateProductItems) {
 
-  for (const key in itens) {
-    iterableItens.push({
+  // Creating and typing array that receives items in key-value format
+  const iterableItems: {
+    key: string;
+    value: string | number | boolean | string[] | undefined;
+  }[] = [];
+
+  // Converting each 'items' property to an object with key-value of to facilitate validation
+  for (const key in items) {
+    iterableItems.push({
       key: key,
-      value: itens[key as keyof CreateProductItens],
+      value: items[key as keyof CreateProductItems],
     });
   }
 
-  iterableItens.forEach((item) => {
+  // Validating each item in the iterable
+  iterableItems.forEach((item) => {
     const { key, value } = item;
 
+    // Ignoring ingredients because it will be validated later
     if (key === 'ingredients') {
       return;
     }
 
+    // Returning an exclusive exception if there is no imagePath
     if (!value && key === 'imagePath') {
       throw {
         type: 'RequiredResourceError',
@@ -26,6 +39,7 @@ export function createProductValidator(itens: CreateProductItens) {
       };
     }
 
+    // Returning an exception if not have other items
     if (!value) {
       throw {
         type: 'RequiredResourceError',
@@ -34,17 +48,20 @@ export function createProductValidator(itens: CreateProductItens) {
     }
   });
 
-  const { ingredients, industrialized, category, price } = itens;
+  const { ingredients, industrialized, category, price } = items;
 
+  // Validating and returning an exception if the product is not industrialized and has no ingredients
   if (industrialized === false && (!ingredients || ingredients.length === 0)) {
     throw {
       type: 'RequiredResourceError',
-      message: 'ingredients is a required file',
+      message: 'ingredients is a required field',
     };
   }
 
+  // Validating if category is 'ObjectId'
   const categoryIsValid = validateObjectId(category);
 
+  // Returning an exception if it is not
   if (!categoryIsValid) {
     throw {
       type: 'TypeError',
@@ -52,6 +69,7 @@ export function createProductValidator(itens: CreateProductItens) {
     };
   }
 
+  // Validating and returning an exception if price is not a number or is not a number greater than 0
   if (isNaN(price) || price <= 0) {
     throw {
       type: 'TypeError',
@@ -60,7 +78,8 @@ export function createProductValidator(itens: CreateProductItens) {
   }
 
   return {
-    ...itens,
+    ...items,
+    // If the product is industrialized, ingredients are not necessary
     ingredients: industrialized === true ? [] : ingredients,
   };
 }

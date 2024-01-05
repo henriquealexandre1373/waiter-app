@@ -1,6 +1,6 @@
 // Types
 import { Request, Response } from 'express';
-import { CreateProductItens } from '../../types/CreateProductItens';
+import { CreateProductItems } from '../../types/CreateProductItems';
 // Models
 import { Product } from '../../models/Product';
 import { Category } from '../../models/Category';
@@ -11,7 +11,7 @@ import { handleError } from '../../helpers/handleError';
 
 export async function createProduct(req: Request, res: Response) {
   try {
-    const itens: CreateProductItens = {
+    const items: CreateProductItems = {
       name: req.body?.name,
       description: req.body?.description,
       price: Number(req.body?.price),
@@ -29,7 +29,7 @@ export async function createProduct(req: Request, res: Response) {
       ingredients,
       industrialized,
       imagePath,
-    } = createProductValidator(itens);
+    } = createProductValidator(items);
 
     const existCategory = await Category.findOne({ _id: category }).lean();
 
