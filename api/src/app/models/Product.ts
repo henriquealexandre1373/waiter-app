@@ -19,6 +19,10 @@ export const Product = model(
       type: Number,
       required: true,
     },
+    industrialized: {
+      type: Boolean,
+      required: true
+    },
     ingredients: {
       required: true,
       type: [
