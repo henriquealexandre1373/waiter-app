@@ -1,30 +1,13 @@
 import { Request, Response } from 'express';
 
+import { createCategoryValidator } from '../../validators/createCategoryValidator';
 import { Category } from '../../models/Category';
 
 export async function createCategory(req: Request, res: Response) {
   try {
     const { icon, name } = req.body;
 
-    if (!icon || !name) {
-      return res
-        .status(400)
-        .json({
-          error: 'Invalid Input Data',
-          message: 'Properties icon and name are required',
-        });
-    }
-
-    const existCategory = await Category.findOne({ name });
-
-    if (existCategory) {
-      return res
-        .status(409)
-        .json({
-          error: 'Duplicated Categories',
-          message: 'A category with this name already exists',
-        });
-    }
+    await createCategoryValidator(icon, name);
 
     const category = await Category.create({ icon, name });
 
