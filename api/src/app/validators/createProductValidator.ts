@@ -2,12 +2,20 @@ import { CreateProductItems } from '../types/CreateProductItems';
 import { validateObjectId } from './generalValidator';
 
 /**
- * Function responsible for validating the creation items of a product.
- * @param items Items for product creation to be validated
- * @returns Valited items or a exception if validation fails
+ * Validates the creation of a product.
+ *
+ * This function checks whether the provided items meet the required criteria for product creation.
+ * It performs various validations on the input items, throwing exceptions for specific validation failures.
+ *
+ * @param {CreateProductItems} items - An object containing properties for product creation.
+ *
+ * @throws {object} Throws exceptions if validation fails, including:
+ *   - type: 'RequiredResourceError' if a required field is missing.
+ *   - type: 'TypeError' if a field has an invalid type.
+ *
+ * @returns {CreateProductItems} Returns the validated items if validation is successful.
  */
 export function createProductValidator(items: CreateProductItems) {
-
   // Creating and typing array that receives items in key-value format
   const iterableItems: {
     key: string;
