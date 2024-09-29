@@ -1,32 +1,17 @@
-import { Request, Response } from 'express';
+import { Request, Response } from 'express'
 
-import { Category } from '../../models/Category';
+import { getCategoriesInDatabase } from '../../interfaces/database/MongoCategoryInterface'
 
 export async function listCategories(req: Request, res: Response) {
-  try {
-    const categories = await Category.find();
+  const categories = await getCategoriesInDatabase()
 
-    if(!categories) {
-      return res
-        .status(404)
-        .json({
-          error: 'Categories Not Found',
-          message: 'No categories were found',
-        });
-    }
-
-    res.json(categories);
-  } catch (error) {
-    if (error instanceof Error) {
-      res.status(500).json({
-        error: error.name,
-        message: error.message,
-      });
-    } else {
-      res.status(500).json({
-        error: 'Unknown error',
-        message: 'An unknown error has occurred',
-      });
+  if (categories.length === 0) {
+    throw {
+      type: 'NotFoundError',
+      error: 'Not Found',
+      message: 'No categories were found',
     }
   }
+
+  return res.json(categories)
 }

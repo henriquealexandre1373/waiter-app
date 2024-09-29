@@ -1,4 +1,4 @@
-import { Category } from '../models/Category'
+import { getCategoryInDatabase } from '../interfaces/database/MongoCategoryInterface'
 
 /**
  * Validates the creation of a category.
@@ -23,16 +23,18 @@ export async function createCategoryValidator(
   if (!icon || !name) {
     throw {
       type: 'RequiredResourceError',
+      error: 'Required Properties',
       message: 'Properties icon and name are required',
     }
   }
 
   // Check if a category with the given name already exists
-  const existCategory = await Category.findOne({ name })
+  const existCategory = await getCategoryInDatabase(name)
 
   if (existCategory) {
     throw {
       type: 'DuplicatedResourceError',
+      error: 'Duplicated Properties',
       message: 'A category with this name already exists',
     }
   }
