@@ -1,5 +1,5 @@
-import { ProductType } from '../types/Product'
-import { validateObjectId } from './generalValidator'
+import { ProductType } from '../customTypes/Product';
+import { validateObjectId } from './generalValidator';
 
 /**
  * Validates the creation of a product.
@@ -18,25 +18,25 @@ import { validateObjectId } from './generalValidator'
 export function createProductValidator(items: ProductType) {
   // Creating and typing array that receives items in key-value format
   const iterableItems: {
-    key: string
-    value: string | number | boolean | string[] | undefined
-  }[] = []
+    key: string;
+    value: string | number | boolean | string[] | undefined;
+  }[] = [];
 
   // Converting each 'items' property to an object with key-value of to facilitate validation
   for (const key in items) {
     iterableItems.push({
       key: key,
       value: items[key as keyof ProductType],
-    })
+    });
   }
 
   // Validating each item in the iterable
   iterableItems.forEach((item) => {
-    const { key, value } = item
+    const { key, value } = item;
 
     // Ignoring ingredients because it will be validated later
     if (key === 'ingredients') {
-      return
+      return;
     }
 
     // Returning an exclusive exception if there is no imagePath
@@ -45,7 +45,7 @@ export function createProductValidator(items: ProductType) {
         type: 'RequiredResourceError',
         error: 'Required Property',
         message: 'imagePath is a required file',
-      }
+      };
     }
 
     // Returning an exception if not have other items
@@ -54,11 +54,11 @@ export function createProductValidator(items: ProductType) {
         type: 'RequiredResourceError',
         error: 'Required Property',
         message: `${key} is a required field`,
-      }
+      };
     }
-  })
+  });
 
-  const { ingredients, industrialized, category, price } = items
+  const { ingredients, industrialized, category, price } = items;
 
   // Validating and returning an exception if the product is not industrialized and has no ingredients
   if (industrialized === false && (!ingredients || ingredients.length === 0)) {
@@ -66,11 +66,11 @@ export function createProductValidator(items: ProductType) {
       type: 'RequiredResourceError',
       error: 'Required Property',
       message: 'ingredients is a required field',
-    }
+    };
   }
 
   // Validating if category is 'ObjectId'
-  const categoryIsValid = validateObjectId(category)
+  const categoryIsValid = validateObjectId(category);
 
   // Returning an exception if it is not
   if (!categoryIsValid) {
@@ -78,7 +78,7 @@ export function createProductValidator(items: ProductType) {
       type: 'TypeError',
       error: 'Invalid Type',
       message: 'category must be a ObjectId',
-    }
+    };
   }
 
   // Validating and returning an exception if price is not a number or is not a number greater than 0
@@ -87,12 +87,12 @@ export function createProductValidator(items: ProductType) {
       type: 'TypeError',
       error: 'Invalid Type',
       message: 'The price must be a number greater than zero',
-    }
+    };
   }
 
   return {
     ...items,
     // If the product is industrialized, ingredients are not necessary
     ingredients: industrialized === true ? [] : ingredients,
-  }
+  };
 }
