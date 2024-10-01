@@ -2,6 +2,10 @@
 const { resolve } = require('path');
 const root = resolve(__dirname);
 
+require('dotenv').config({
+  path: resolve(__dirname, './env/env.test'),
+});
+
 module.exports = {
   testEnvironment: 'node',
   testPathIgnorePatterns: ['/node_modules/'],
@@ -30,12 +34,17 @@ module.exports = {
       displayName: 'unit',
       testMatch: ['<rootDir>/test/unit/**/*.test.ts'],
       coverageDirectory: 'coverage/unit',
+      setupFilesAfterEnv: ['<rootDir>/test/jest.setup.ts'],
     },
     {
       displayName: 'integration',
       testMatch: ['<rootDir>/test/integration/**/*.test.ts'],
       maxWorkers: 1,
       detectOpenHandles: true,
+      setupFilesAfterEnv: [
+        '<rootDir>/test/jest.setup.ts',
+        'tsconfig-paths/register',
+      ],
     },
     {
       displayName: 'e2e',
