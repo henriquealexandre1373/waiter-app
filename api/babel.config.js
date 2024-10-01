@@ -7,8 +7,14 @@ module.exports = {
         alias: {
           '@src': './src',
           '@test': './test',
+          '@useCases': './src/app/useCases',
+          '@interfaces': './src/app/interfaces',
+          '@validators': './src/app/validators',
+          '@customTypes': './src/app/customTypes',
+          '@models': './src/app/models',
+          '@services': './src/app/services',
         },
       },
     ],
   ],
-}
+};
