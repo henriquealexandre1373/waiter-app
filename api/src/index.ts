@@ -1,15 +1,22 @@
 import path from 'node:path';
+import dotenv from 'dotenv';
 import express from 'express';
-import mongoose from 'mongoose';
+
+dotenv.config({ path: path.resolve(__dirname, '..env/.env') });
 
 import { router } from './router';
 import errorHandler from '@interfaces/http/middlewares/errorHandlerMiddleware';
+import logger from '@services/loggerService';
+import { connectToMongo } from '@interfaces/database/MongoConnection';
 
-mongoose
-  .connect('mongodb://localhost:27017')
-  .then(() => {
-    const app = express();
-    const port = 3001;
+export const app = express();
+const port = process.env.PORT;
+
+const mongoUri = process.env.MONGO_URI as string;
+
+const startServer = async () => {
+  try {
+    await connectToMongo(mongoUri);
 
     app.use(
       '/uploads',
@@ -20,7 +27,11 @@ mongoose
     app.use(errorHandler);
 
     app.listen(port, () => {
-      console.log(`Server is running on http://localhost:${port}`);
+      logger.info(`Server is running on http://localhost:${port}`);
     });
-  })
-  .catch(() => console.log('Error connecting to mongodb'));
+  } catch (error) {
+    logger.error('Error starting the server');
+  }
+};
+
+startServer();
