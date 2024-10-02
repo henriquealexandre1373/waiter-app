@@ -1,8 +1,9 @@
+import { CustomError } from '@src/app/customTypes/CustomError';
 import logger from '../../../services/loggerService';
 import { Request, Response, NextFunction } from 'express';
 
 export default function errorHandler(
-  err: any,
+  err: CustomError,
   req: Request,
   res: Response,
   next: NextFunction
@@ -41,4 +42,6 @@ export default function errorHandler(
   res.status(statusCode).json({
     ...baseError,
   });
+
+  next();
 }

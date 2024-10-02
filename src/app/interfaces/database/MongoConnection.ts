@@ -1,7 +1,7 @@
 import logger from '@services/loggerService';
 import mongoose from 'mongoose';
 
-let isTestEnv = process.env.NODE_ENV === 'test';
+const isTestEnv = process.env.NODE_ENV === 'test';
 
 export const connectToMongo = async (uri: string) => {
   try {

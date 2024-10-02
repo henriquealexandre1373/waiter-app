@@ -21,7 +21,7 @@ export const Product = model(
     },
     industrialized: {
       type: Boolean,
-      required: true
+      required: true,
     },
     ingredients: {
       required: true,
