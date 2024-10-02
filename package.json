@@ -8,7 +8,9 @@
     "dev": "ts-node -r tsconfig-paths/register src/index.ts",
     "test:integration": "jest --testPathPattern=integration --runInBand --forceExit --coverage --detectOpenHandles",
     "test:unit": "jest --testPathPattern=unit --coverage --watch",
-    "test:e2e": "jest --testPathPattern=e2e --runInBand --detectOpenHandles --watch-all --forceExit"
+    "test:e2e": "jest --testPathPattern=e2e --runInBand --detectOpenHandles --watch-all --forceExit",
+    "lint": "eslint ./src ./test --ext .ts",
+    "lint:fix": "eslint ./src ./test --ext .ts --fix"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
