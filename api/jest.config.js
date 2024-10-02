@@ -9,7 +9,7 @@ require('dotenv').config({
 module.exports = {
   testEnvironment: 'node',
   testPathIgnorePatterns: ['/node_modules/'],
-  collectCoverageFrom: ['src/**/*.ts'],
+  collectCoverageFrom: ['src/**/*.ts', '!**/*.d.ts'],
   clearMocks: true,
   rootDir: root,
   verbose: true,
@@ -51,9 +51,9 @@ module.exports = {
       testMatch: ['<rootDir>/test/e2e/**/*.test.ts'],
       maxWorkers: 1,
       detectOpenHandles: true,
-      globalSetup: '<rootDir>/test/e2e/global-setup.js',
-      globalTeardown: '<rootDir>/test/e2e/global-teardown.js',
-      setupFilesAfterEnv: ['<rootDir>/test/e2e/jest-setup.ts'],
+      // globalSetup: '<rootDir>/test/e2e/global-setup.js',
+      // globalTeardown: '<rootDir>/test/e2e/global-teardown.js',
+      // setupFilesAfterEnv: ['<rootDir>/test/e2e/jest-setup.ts'],
     },
   ],
 };
