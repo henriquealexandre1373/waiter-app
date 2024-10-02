@@ -2,7 +2,7 @@ import path from 'node:path';
 import dotenv from 'dotenv';
 import express from 'express';
 
-dotenv.config({ path: path.resolve(__dirname, '..env/.env') });
+dotenv.config({ path: path.resolve(__dirname, '../env/.env') });
 
 import { router } from './router';
 import errorHandler from '@interfaces/http/middlewares/errorHandlerMiddleware';
