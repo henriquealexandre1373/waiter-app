@@ -1,14 +1,27 @@
 // Types
 import { Request, Response } from 'express';
 // Interfaces
-import { createCategoryInDatabase } from '@interfaces/database/MongoCategoryInterface';
+import {
+  createCategoryInDatabase,
+  getCategoryInDatabase,
+} from '@interfaces/database/MongoCategoryInterface';
 // Validators
-import { createCategoryValidator } from '@validators/createCategoryValidator';
+import { validateCreateCategory } from '@validators/createCategoryValidator';
 
 export async function createCategory(req: Request, res: Response) {
   const { icon, name } = req.body;
 
-  await createCategoryValidator(icon, name);
+  await validateCreateCategory(req.body);
+
+  const existCategory = await getCategoryInDatabase(name);
+
+  if (existCategory) {
+    throw {
+      type: 'DuplicatedResourceError',
+      error: 'Duplicated Properties',
+      message: 'A category with this name already exists',
+    };
+  }
 
   const category = await createCategoryInDatabase({ icon, name });
 

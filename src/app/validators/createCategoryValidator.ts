@@ -1,43 +1,21 @@
-import { getCategoryInDatabase } from '../interfaces/database/MongoCategoryInterface';
+import { z } from 'zod';
 
-/**
- * Validates the creation of a category.
- *
- * This function checks whether the provided icon and name meet the required criteria for category creation.
- * It also ensures that a category with the given name doesn't already exist in the database.
- *
- * @param {string} icon - The icon for the category.
- * @param {string} name - The name of the category.
- *
- * @throws {object} Throws an exception if validation fails, including:
- *   - type: 'RequiredResourceError' if icon or name is missing.
- *   - type: 'DuplicatedResourceError' if a category with the provided name already exists.
- *
- * @returns {Promise<void>} Resolves if validation is successful; otherwise, an exception is thrown.
- */
-export async function createCategoryValidator(
-  icon: string,
-  name: string
-): Promise<void> {
-  // Check if icon and name are provided
-  if (!icon || !name) {
-    throw {
-      type: 'RequiredResourceError',
-      error: 'Required Properties',
-      message: 'Properties icon and name are required',
-    };
-  }
+const isEmoji = (value: string) => {
+  const emojiRegex = /(\p{Emoji_Presentation}|\p{Extended_Pictographic})/gu;
+  return emojiRegex.test(value);
+};
 
-  // Check if a category with the given name already exists
-  const existCategory = await getCategoryInDatabase(name);
+const CategorySchema = z.object({
+  icon: z
+    .string()
+    .refine(isEmoji, { message: 'The icon must be a valid emoji' }),
+  name: z.string({ required_error: 'The name is required' }).min(1),
+});
 
-  if (existCategory) {
-    throw {
-      type: 'DuplicatedResourceError',
-      error: 'Duplicated Properties',
-      message: 'A category with this name already exists',
-    };
-  }
+type CategoryType = z.infer<typeof CategorySchema>;
 
-  return;
+async function validateCreateCategory(data: unknown) {
+  return CategorySchema.parseAsync(data);
 }
+
+export { CategorySchema, CategoryType, validateCreateCategory };

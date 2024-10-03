@@ -1,5 +1,5 @@
 // Types
-import { CategoryType } from '@customTypes/Category';
+import { CategoryType } from '@src/app/validators/createCategoryValidator';
 // Models
 import { Category } from '@models/Category';
 // Services
@@ -17,9 +17,9 @@ export const getCategoriesInDatabase = async () => {
   }
 };
 
-export const getCategoryInDatabase = async (categoryName: string) => {
+export const getCategoryInDatabase = async (name: string) => {
   try {
-    return await Category.findOne({ categoryName }).lean();
+    return await Category.findOne({ name }).lean();
   } catch (error: unknown) {
     throw {
       type: 'DataBaseError',
