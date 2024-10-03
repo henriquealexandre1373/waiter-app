@@ -8,6 +8,7 @@ import { router } from './router';
 import errorHandler from '@interfaces/http/middlewares/errorHandlerMiddleware';
 import logger from '@services/loggerService';
 import { connectToMongo } from '@interfaces/database/MongoConnection';
+import { zodErrorHandler } from './app/interfaces/http/middlewares/zodErrorHandlerMiddleware';
 
 export const app = express();
 const port = process.env.PORT;
@@ -24,6 +25,7 @@ const startServer = async () => {
     );
     app.use(express.json());
     app.use(router);
+    app.use(zodErrorHandler);
     app.use(errorHandler);
 
     app.listen(port, () => {
