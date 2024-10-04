@@ -24,6 +24,8 @@ afterEach(async () => {
     const collection = collections[key];
     await collection.deleteMany({});
   }
+
+  jest.clearAllMocks();
 });
 
 afterAll(async () => {
