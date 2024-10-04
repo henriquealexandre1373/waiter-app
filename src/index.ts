@@ -28,9 +28,11 @@ const startServer = async () => {
     app.use(zodErrorHandler);
     app.use(errorHandler);
 
-    app.listen(port, () => {
-      logger.info(`Server is running on http://localhost:${port}`);
-    });
+    if (process.env.NODE_ENV !== 'test') {
+      app.listen(port, () => {
+        logger.info(`Server is running on http://localhost:${port}`);
+      });
+    }
   } catch (error) {
     logger.error('Error starting the server');
   }
