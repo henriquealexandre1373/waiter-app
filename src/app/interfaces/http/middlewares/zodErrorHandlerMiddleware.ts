@@ -16,11 +16,11 @@ export function zodErrorHandler(
     }));
 
     formattedErrors.forEach((formattedError) =>
-      logger.error(`ValidationError - ${formattedError.message}`)
+      logger.error(`Validation Error - ${formattedError.message}`)
     );
 
     return res.status(400).json({
-      error: 'ValidationError',
+      error: 'Validation Error',
       message: 'Invalid input data',
       details: formattedErrors,
     });
