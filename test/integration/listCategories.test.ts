@@ -1,12 +1,11 @@
+// Libs
 import request from 'supertest';
+// Server
 import { app } from '@src/index';
-import { Category } from '@src/app/models/Category';
-
-const createCategoryFactory = async (
-  category = { icon: '🤖', name: 'test' }
-) => {
-  await request(app).post('/categories').send(category);
-};
+// Models
+import { Category } from '@models/Category';
+// Mocks
+import { categoryBodies } from '@mocks/createCategory.mock';
 
 describe('List Categories Tests', () => {
   it('must not a list categories because there is no category registered --fail-case', async () => {
@@ -32,15 +31,13 @@ describe('List Categories Tests', () => {
   });
 
   it('must list categories --success-case', async () => {
-    const categoryData = {
-      icon: '🤖',
-      name: 'test',
-    };
-    await createCategoryFactory(categoryData);
+    const category = categoryBodies['valid'];
+
+    await request(app).post('/categories').send(category);
 
     const { status, body } = await request(app).get('/categories');
     expect(status).toBe(200);
-    expect(body[0].icon).toStrictEqual(categoryData.icon);
-    expect(body[0].name).toStrictEqual(categoryData.name);
+    expect(body[0].icon).toStrictEqual(category.icon);
+    expect(body[0].name).toStrictEqual(category.name);
   });
 });
