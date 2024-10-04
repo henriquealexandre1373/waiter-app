@@ -7,6 +7,7 @@ module.exports = {
         alias: {
           '@src': './src',
           '@test': './test',
+          '@mocks': './test/mocks',
           '@useCases': './src/app/useCases',
           '@interfaces': './src/app/interfaces',
           '@validators': './src/app/validators',
