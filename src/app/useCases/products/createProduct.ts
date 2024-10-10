@@ -1,8 +1,8 @@
 // Types
 import { Request, Response } from 'express';
-import { ProductType } from '@customTypes/Product';
+// import { ProductType } from '@customTypes/Product';
 // Validators
-import { createProductValidator } from '@validators/createProductValidator';
+import { validateCreateProduct } from '@validators/createProductValidator';
 import { getCategoryInDatabase } from '@interfaces/database/MongoCategoryInterface';
 // Interfaces
 import {
@@ -11,16 +11,6 @@ import {
 } from '@interfaces/database/MongoProductInterface';
 
 export async function createProduct(req: Request, res: Response) {
-  const items: ProductType = {
-    name: req.body?.name,
-    description: req.body?.description,
-    price: Number(req.body?.price),
-    category: req.body?.category,
-    ingredients: req.body?.ingredients,
-    industrialized: Boolean(req.body?.industrialized),
-    imagePath: req.file?.filename,
-  };
-
   const {
     name,
     description,
@@ -29,7 +19,10 @@ export async function createProduct(req: Request, res: Response) {
     ingredients,
     industrialized,
     imagePath,
-  } = createProductValidator(items);
+  } = await validateCreateProduct({
+    ...req.body,
+    imagePath: req.file?.filename,
+  });
 
   const existCategory = await getCategoryInDatabase(category);
 
