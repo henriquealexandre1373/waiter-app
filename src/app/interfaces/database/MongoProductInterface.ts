@@ -1,5 +1,6 @@
 // Types
-import { FindProductType, ProductType } from '@customTypes/Product';
+import { ProductType } from '@validators/createProductValidator';
+type FindProductType = Pick<ProductType, 'category' | 'name'>;
 // Models
 import { Product } from '@models/Product';
 // Services
