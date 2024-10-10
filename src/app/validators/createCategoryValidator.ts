@@ -1,12 +1,6 @@
 import { z } from 'zod';
-
-const requiredString = (fieldName: string) =>
-  z.string({ required_error: `The ${fieldName} is required` });
-
-const isEmoji = (value: string) => {
-  const emojiRegex = /(\p{Emoji_Presentation}|\p{Extended_Pictographic})/gu;
-  return emojiRegex.test(value);
-};
+import { requiredString } from './utils/required-error';
+import { isEmoji } from './generalValidator';
 
 const CategorySchema = z.object({
   icon: requiredString('icon').refine(isEmoji, {
@@ -17,8 +11,8 @@ const CategorySchema = z.object({
 
 type CategoryType = z.infer<typeof CategorySchema>;
 
-async function validateCreateCategory(data: unknown) {
-  return CategorySchema.parseAsync(data);
+function validateCreateCategory(data: unknown) {
+  return CategorySchema.parse(data);
 }
 
 export { CategorySchema, CategoryType, validateCreateCategory };

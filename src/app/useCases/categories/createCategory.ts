@@ -11,7 +11,7 @@ import { validateCreateCategory } from '@validators/createCategoryValidator';
 export async function createCategory(req: Request, res: Response) {
   const { icon, name } = req.body;
 
-  await validateCreateCategory(req.body);
+  validateCreateCategory(req.body);
 
   const existCategory = await getCategoryInDatabase(name);
 
