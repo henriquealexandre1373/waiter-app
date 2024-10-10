@@ -7,7 +7,7 @@ dotenv.config({ path: path.resolve(__dirname, '../env/.env') });
 import { router } from './router';
 import errorHandler from '@interfaces/http/middlewares/errorHandlerMiddleware';
 import logger from '@services/loggerService';
-import { connectToMongo } from '@interfaces/database/MongoConnection';
+import { connectToMongo } from '@src/infra/database/MongoConnection';
 import { zodErrorHandler } from './app/interfaces/http/middlewares/zodErrorHandlerMiddleware';
 
 export const app = express();
