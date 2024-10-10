@@ -1,98 +1,64 @@
-import { ProductType } from '../customTypes/Product';
-import { validateObjectId } from './generalValidator';
+import { isEmoji, isObjectId } from './generalValidator';
 
-/**
- * Validates the creation of a product.
- *
- * This function checks whether the provided items meet the required criteria for product creation.
- * It performs various validations on the input items, throwing exceptions for specific validation failures.
- *
- * @param {CreateProductItems} items - An object containing properties for product creation.
- *
- * @throws {object} Throws exceptions if validation fails, including:
- *   - type: 'RequiredResourceError' if a required field is missing.
- *   - type: 'TypeError' if a field has an invalid type.
- *
- * @returns {CreateProductItems} Returns the validated items if validation is successful.
- */
-export function createProductValidator(items: ProductType) {
-  // Creating and typing array that receives items in key-value format
-  const iterableItems: {
-    key: string;
-    value: string | number | boolean | string[] | undefined;
-  }[] = [];
+import { z } from 'zod';
+import { requiredString } from './utils/required-error';
 
-  // Converting each 'items' property to an object with key-value of to facilitate validation
-  for (const key in items) {
-    iterableItems.push({
-      key: key,
-      value: items[key as keyof ProductType],
-    });
-  }
+const ingredientsSchema = z.object({
+  name: requiredString('ingredient name').min(1),
+  icon: requiredString('ingredient icon').refine(isEmoji, {
+    message: 'The ingredient icon must be a valid emoji',
+  }),
+});
 
-  // Validating each item in the iterable
-  iterableItems.forEach((item) => {
-    const { key, value } = item;
-
-    // Ignoring ingredients because it will be validated later
-    if (key === 'ingredients') {
-      return;
-    }
-
-    // Returning an exclusive exception if there is no imagePath
-    if (!value && key === 'imagePath') {
-      throw {
-        type: 'RequiredResourceError',
-        error: 'Required Property',
-        message: 'imagePath is a required file',
-      };
-    }
-
-    // Returning an exception if not have other items
-    if (!value) {
-      throw {
-        type: 'RequiredResourceError',
-        error: 'Required Property',
-        message: `${key} is a required field`,
-      };
+const ProductSchema = z
+  .object({
+    name: requiredString('name').min(1),
+    description: requiredString('description').min(1),
+    price: z.preprocess(
+      (price) => parseFloat(price as string),
+      z.number().positive({ message: 'Price must be a positive number' })
+    ),
+    category: requiredString('category').refine(isObjectId, {
+      message: 'The category must be a valid ObjectId',
+    }),
+    ingredients: z.preprocess((ingredients) => {
+      if (typeof ingredients === 'string') {
+        try {
+          return JSON.parse(ingredients);
+        } catch {
+          return [];
+        }
+      }
+      return ingredients;
+    }, z.array(ingredientsSchema).optional().default([])),
+    industrialized: z.preprocess(
+      (industrialized) => industrialized === 'true' || industrialized === true,
+      z.boolean().default(false)
+    ),
+    imagePath: z.string().optional(),
+  })
+  .superRefine(({ industrialized, ingredients }, ctx) => {
+    if (industrialized && ingredients.length > 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'Ingredients should not be provided if the product is industrialized',
+        path: ['ingredients'],
+      });
+    } else if (!industrialized && ingredients.length === 0) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message:
+          'Ingredients must be provided if the product is not industrialized',
+        path: ['ingredients'],
+      });
     }
   });
 
-  const { ingredients, industrialized, category, price } = items;
+type ProductType = z.infer<typeof ProductSchema>;
 
-  // Validating and returning an exception if the product is not industrialized and has no ingredients
-  if (industrialized === false && (!ingredients || ingredients.length === 0)) {
-    throw {
-      type: 'RequiredResourceError',
-      error: 'Required Property',
-      message: 'ingredients is a required field',
-    };
-  }
-
-  // Validating if category is 'ObjectId'
-  const categoryIsValid = validateObjectId(category);
-
-  // Returning an exception if it is not
-  if (!categoryIsValid) {
-    throw {
-      type: 'TypeError',
-      error: 'Invalid Type',
-      message: 'category must be a ObjectId',
-    };
-  }
-
-  // Validating and returning an exception if price is not a number or is not a number greater than 0
-  if (isNaN(price) || price <= 0) {
-    throw {
-      type: 'TypeError',
-      error: 'Invalid Type',
-      message: 'The price must be a number greater than zero',
-    };
-  }
-
-  return {
-    ...items,
-    // If the product is industrialized, ingredients are not necessary
-    ingredients: industrialized === true ? [] : ingredients,
-  };
+async function validateCreateProduct(data: unknown) {
+  return ProductSchema.parseAsync(data);
 }
+
+export { ProductSchema, ProductType, validateCreateProduct };
