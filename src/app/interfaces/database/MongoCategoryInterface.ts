@@ -17,9 +17,9 @@ export const getCategoriesInDatabase = async () => {
   }
 };
 
-export const getCategoryInDatabase = async (name: string) => {
+export const getCategoryInDatabase = async (_id: string) => {
   try {
-    return await Category.findOne({ name }).lean();
+    return await Category.findOne({ _id }).lean();
   } catch (error: unknown) {
     throw {
       type: 'DataBaseError',
