@@ -1,4 +1,5 @@
 import path from 'node:path';
+import fs from 'fs';
 
 import { Router } from 'express';
 import multer from 'multer';
@@ -11,10 +12,25 @@ import { asyncHandler } from '@interfaces/http/middlewares/asyncHandlerMiddlewar
 
 export const router = Router();
 
+const isTestEnv = process.env.NODE_ENV === 'test';
+
+const tempDir = path.resolve(__dirname, '..', 'tmp');
+
+const ensureDirExists = (dir: string) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+};
+
 const upload = multer({
   storage: multer.diskStorage({
     destination(req, file, callback) {
-      callback(null, path.resolve(__dirname, '..', 'uploads'));
+      if (isTestEnv) {
+        ensureDirExists(tempDir);
+        callback(null, path.resolve(__dirname, '..', 'tmp'));
+      } else {
+        callback(null, path.resolve(__dirname, '..', 'uploads'));
+      }
     },
     filename(req, file, callback) {
       callback(null, `${Date.now()}-${file.originalname}`);
