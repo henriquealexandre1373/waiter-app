@@ -5,6 +5,11 @@ import { Category } from '@models/Category';
 // Services
 import logger from '@services/loggerService';
 
+type getCategoryInDatabaseType = {
+  name?: string;
+  _id?: string;
+};
+
 export const getCategoriesInDatabase = async () => {
   try {
     return await Category.find().lean();
@@ -17,9 +22,11 @@ export const getCategoriesInDatabase = async () => {
   }
 };
 
-export const getCategoryInDatabase = async (_id: string) => {
+export const getCategoryInDatabase = async (
+  filter: getCategoryInDatabaseType
+) => {
   try {
-    return await Category.findOne({ _id }).lean();
+    return await Category.findOne(filter).lean();
   } catch (error: unknown) {
     throw {
       type: 'DataBaseError',

@@ -13,7 +13,7 @@ export async function createCategory(req: Request, res: Response) {
 
   validateCreateCategory(req.body);
 
-  const existCategory = await getCategoryInDatabase(name);
+  const existCategory = await getCategoryInDatabase({ name });
 
   if (existCategory) {
     throw {

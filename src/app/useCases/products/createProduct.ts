@@ -24,7 +24,7 @@ export async function createProduct(req: Request, res: Response) {
     imagePath: req.file?.filename,
   });
 
-  const existCategory = await getCategoryInDatabase(category);
+  const existCategory = await getCategoryInDatabase({ _id: category });
 
   if (!existCategory) {
     throw {
