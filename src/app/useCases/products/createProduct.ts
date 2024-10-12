@@ -1,6 +1,5 @@
 // Types
 import { Request, Response } from 'express';
-// import { ProductType } from '@customTypes/Product';
 // Validators
 import { validateCreateProduct } from '@validators/createProductValidator';
 import { getCategoryInDatabase } from '@interfaces/database/MongoCategoryInterface';
