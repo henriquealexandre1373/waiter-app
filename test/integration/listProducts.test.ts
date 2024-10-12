@@ -26,11 +26,7 @@ describe('List Products Tests', () => {
         .field('category', _id)
         .field('ingredients[0][name]', 'jest')
         .field('ingredients[0][icon]', '🤖')
-        .attach(
-          'image',
-          Buffer.from('mock file content'),
-          '12313213241-test.png'
-        );
+        .attach('image', Buffer.from('mock file content'), 'test.png');
       setupComplete = true;
     }
   };
