@@ -45,6 +45,7 @@ module.exports = {
         '<rootDir>/test/jest.setup.ts',
         'tsconfig-paths/register',
       ],
+      globalTeardown: '<rootDir>/test/configs/globalTeardown.js',
     },
     {
       displayName: 'e2e',
