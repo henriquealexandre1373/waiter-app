@@ -15,8 +15,15 @@ const ProductSchema = z
     name: requiredString('name').min(1),
     description: requiredString('description').min(1),
     price: z.preprocess(
-      (price) => parseFloat(price as string),
-      z.number().positive({ message: 'Price must be a positive number' })
+      (price) => {
+        if (!price) {
+          return undefined;
+        }
+        return parseFloat(price as string);
+      },
+      z
+        .number({ required_error: 'The price is required' })
+        .positive({ message: 'Price must be a positive number' })
     ),
     category: requiredString('category').refine(isObjectId, {
       message: 'The category must be a valid ObjectId',
