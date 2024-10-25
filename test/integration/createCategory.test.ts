@@ -9,7 +9,7 @@ import {
   categoryBodies,
   validationErrors,
 } from '@test/mocks/createCategory.mock';
-// Utils
+
 function generateValidationTest(
   body: Record<string, string | number>,
   description: string,
@@ -112,6 +112,7 @@ describe('Create Category Tests', () => {
 
   it('must create category --success-case', async () => {
     const category = categoryBodies['valid'];
+
     const { status, body } = await request(app)
       .post('/categories')
       .send(category);

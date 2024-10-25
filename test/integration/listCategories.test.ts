@@ -34,7 +34,6 @@ describe('List Categories Tests', () => {
     const category = categoryBodies['valid'];
 
     await request(app).post('/categories').send(category);
-
     const { status, body } = await request(app).get('/categories');
     expect(status).toBe(200);
     expect(body[0].icon).toStrictEqual(category.icon);

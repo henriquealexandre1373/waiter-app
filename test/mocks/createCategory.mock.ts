@@ -1,4 +1,4 @@
-type CategoryBody = {
+export type CategoryBody = {
   icon?: string | number;
   name?: string | number;
 };
@@ -10,7 +10,6 @@ export const categoryBodies: Record<string, CategoryBody> = {
   invalidEmojiIcon: { icon: '123', name: 'test' },
   invalidTypeIcon: { icon: 123, name: 'test' },
   invalidTypeName: { icon: '🤖', name: 123 },
-  // emptyBody: {},
 };
 
 export const validationErrors = {
