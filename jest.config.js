@@ -9,7 +9,7 @@ require('dotenv').config({
 module.exports = {
   testEnvironment: 'node',
   testPathIgnorePatterns: ['/node_modules/'],
-  collectCoverageFrom: ['src/**/*.ts', '!**/*.d.ts'],
+  collectCoverageFrom: ['src/app/**/*.ts', '!**/*.d.ts'],
   clearMocks: true,
   rootDir: root,
   verbose: true,
