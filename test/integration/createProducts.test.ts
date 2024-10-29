@@ -65,6 +65,33 @@ describe('Create Products Tests', () => {
         'should fail when no ingredients icon is provided --fail case',
       expectedDetails: validationErrors.noIngredientsIcon,
     },
+    {
+      body: productBodies.invalidTypeName,
+      description: 'should fail when name is not a string --fail case',
+      expectedDetails: validationErrors.invalidTypeName,
+    },
+    {
+      body: productBodies.invalidTypeDescription,
+      description: 'should fail when description is not a string --fail case',
+      expectedDetails: validationErrors.invalidTypeDescription,
+    },
+    {
+      body: productBodies.invalidTypePrice,
+      description: 'should fail when price is not a string --fail case',
+      expectedDetails: validationErrors.invalidTypePrice,
+    },
+    {
+      body: productBodies.invalidTypeIngredientsName,
+      description:
+        'should fail when ingredients name is not a string --fail case',
+      expectedDetails: validationErrors.invalidTypeIngredientsName,
+    },
+    {
+      body: productBodies.invalidTypeIngredientsIcon,
+      description:
+        'should fail when ingredients icon is not a string --fail case',
+      expectedDetails: validationErrors.invalidTypeIngredientsIcon,
+    },
   ];
 
   validationTestCases.forEach(({ body, description, expectedDetails }) =>
