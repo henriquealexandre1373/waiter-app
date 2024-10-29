@@ -4,10 +4,12 @@ import { z } from 'zod';
 import { requiredString } from './utils/required-error';
 
 const ingredientsSchema = z.object({
-  name: requiredString('ingredient name').min(1),
-  icon: requiredString('ingredient icon').refine(isEmoji, {
-    message: 'The ingredient icon must be a valid emoji',
-  }),
+  name: requiredString('ingredient name').min(1).max(50),
+  icon: z
+    .string({ required_error: 'The ingredient icon is required' })
+    .refine(isEmoji, {
+      message: 'The ingredient icon must be a valid emoji',
+    }),
 });
 
 const ProductSchema = z
@@ -16,10 +18,12 @@ const ProductSchema = z
     description: requiredString('description').min(1),
     price: z.preprocess(
       (price) => {
-        if (!price) {
-          return undefined;
+        if (typeof price === 'string' || typeof price === 'number') {
+          const parsedPrice = parseFloat(price.toString());
+          return isNaN(parsedPrice) ? null : parsedPrice;
         }
-        return parseFloat(price as string);
+
+        return undefined;
       },
       z
         .number({ required_error: 'The price is required' })
