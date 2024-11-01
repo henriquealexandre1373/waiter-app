@@ -19,12 +19,6 @@ export default function errorHandler(
   let statusCode = 500;
 
   switch (err.type) {
-    case 'RequiredResourceError':
-      statusCode = 400;
-      break;
-    case 'TypeError':
-      statusCode = 400;
-      break;
     case 'DuplicatedResourceError':
       statusCode = 409;
       break;
