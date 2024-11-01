@@ -9,9 +9,14 @@ export const connectToMongo = async (uri: string) => {
       return;
     }
 
-    await mongoose.connect(
-      process.env.MONGO_URI || 'mongodb://localhost:27017'
-    );
+    if (!uri) {
+      throw new Error('MONGO_URI is not defined');
+    }
+
+    await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
     logger.info(`Connected to MongoDB at ${uri}`);
   } catch (error) {
     logger.error('Error connecting to MongoDB:', error);
