@@ -8,6 +8,8 @@ import {
   validationErrors,
 } from '@test/mocks/createProduct.mock';
 import { categoryBodies } from '@test/mocks/createCategory.mock';
+import { Category } from '@src/app/models/Category';
+import { Product } from '@src/app/models/Product';
 // Utils
 // import { createProductSetup } from './utils/createProductSetup';
 
@@ -19,9 +21,13 @@ function generateValidationTest(
   expectedDetails: Array<object>
 ) {
   it(description, async () => {
+    if (!body.category) {
+      body.category = categoryId;
+    }
+
     const { status, body: responseBody } = await request(app)
       .post('/products')
-      .field({ ...body, category: categoryId })
+      .field(body)
       .attach('image', Buffer.from('mock file content'), 'test.png');
     expect(status).toBe(400);
     expect(responseBody.error).toBe('Validation Error');
@@ -81,6 +87,11 @@ describe('Create Products Tests', () => {
       expectedDetails: validationErrors.invalidTypePrice,
     },
     {
+      body: productBodies.invalidTypeCategory,
+      description: 'should fail when category is not a ObjectId --fail case',
+      expectedDetails: validationErrors.invalidTypeCategory,
+    },
+    {
       body: productBodies.invalidTypeIngredientsName,
       description:
         'should fail when ingredients name is not a string --fail case',
@@ -92,14 +103,131 @@ describe('Create Products Tests', () => {
         'should fail when ingredients icon is not a string --fail case',
       expectedDetails: validationErrors.invalidTypeIngredientsIcon,
     },
+    {
+      body: productBodies.invalidIndustrializedProduct,
+      description:
+        'should fail when industrialized product have ingredients --fail case',
+      expectedDetails: validationErrors.invalidIndustrializedProduct,
+    },
+    {
+      body: productBodies.invalidNotIndustrializedProduct,
+      description:
+        'should fail when not industrialized product do not have ingredients --fail case',
+      expectedDetails: validationErrors.invalidNotIndustrializedProduct,
+    },
   ];
 
   validationTestCases.forEach(({ body, description, expectedDetails }) =>
     generateValidationTest(body, description, expectedDetails)
   );
 
-  it('must be able to create products --success case', async () => {
-    const bodyToRequest = { ...productBodies.valid, category: categoryId };
+  it('should handle mongodb errors when finding one category normally --fail-case', async () => {
+    const bodyToRequest = {
+      ...productBodies.validNotIndustrialized,
+      category: categoryId,
+    };
+
+    jest.spyOn(Category, 'findOne').mockImplementationOnce(() => {
+      throw new Error();
+    });
+
+    const { status, body } = await request(app)
+      .post('/products')
+      .field(bodyToRequest)
+      .attach('image', Buffer.from('mock file content'), 'test.png');
+    expect(status).toBe(503);
+    expect(body).toStrictEqual({
+      error: 'Error on FindOne',
+      message: 'Error Finding Category',
+    });
+  });
+
+  it('should handle error when category not exists in database --fail-case', async () => {
+    const bodyToRequest = {
+      ...productBodies.validNotIndustrialized,
+      category: '6724baeb3eeabf53569904bb',
+    };
+
+    const { status, body } = await request(app)
+      .post('/products')
+      .field(bodyToRequest)
+      .attach('image', Buffer.from('mock file content'), 'test.png');
+    expect(status).toBe(404);
+    expect(body).toStrictEqual({
+      error: 'Not Found',
+      message: 'Category does not exist in the database',
+    });
+  });
+
+  it('should handle error when product already exists in database --fail-case', async () => {
+    const bodyToRequest = {
+      ...productBodies.validNotIndustrialized,
+      category: categoryId,
+    };
+
+    await request(app)
+      .post('/products')
+      .field(bodyToRequest)
+      .attach('image', Buffer.from('mock file content'), 'test.png');
+
+    const { status, body } = await request(app)
+      .post('/products')
+      .field(bodyToRequest)
+      .attach('image', Buffer.from('mock file content'), 'test.png');
+    expect(status).toBe(409);
+    expect(body).toStrictEqual({
+      error: 'Duplicated Properties',
+      message: 'There is already a product with this name in this category',
+    });
+  });
+
+  it('should handle mongodb errors when error on create product --fail-case', async () => {
+    const bodyToRequest = {
+      ...productBodies.validNotIndustrialized,
+      category: categoryId,
+    };
+
+    jest.spyOn(Product, 'create').mockImplementationOnce(() => {
+      throw new Error();
+    });
+
+    const { status, body } = await request(app)
+      .post('/products')
+      .field(bodyToRequest)
+      .attach('image', Buffer.from('mock file content'), 'test.png');
+    expect(status).toBe(503);
+    expect(body).toStrictEqual({
+      error: 'Error on Create',
+      message: 'Error Creating Product',
+    });
+  });
+
+  it('should handle mongodb errors when error on find product --fail-case', async () => {
+    const bodyToRequest = {
+      ...productBodies.validNotIndustrialized,
+      category: categoryId,
+    };
+
+    jest.spyOn(Product, 'findOne').mockImplementationOnce(() => {
+      throw new Error();
+    });
+
+    const { status, body } = await request(app)
+      .post('/products')
+      .field(bodyToRequest)
+      .attach('image', Buffer.from('mock file content'), 'test.png');
+    expect(status).toBe(503);
+    expect(body).toStrictEqual({
+      error: 'Error on FindOne',
+      message: 'Error Finding Product',
+    });
+  });
+
+  it('must be able to create a not industrialized product --success case', async () => {
+    const bodyToRequest = {
+      ...productBodies.validNotIndustrialized,
+      category: categoryId,
+    };
 
     const { statusCode, body } = await request(app)
       .post('/products')
@@ -119,6 +247,29 @@ describe('Create Products Tests', () => {
             icon: '🤖',
           }),
         ],
+      })
+    );
+  });
+
+  it('must be able to create a industrialized product --success case', async () => {
+    const bodyToRequest = {
+      ...productBodies.validIndustrialized,
+      category: categoryId,
+    };
+
+    const { statusCode, body } = await request(app)
+      .post('/products')
+      .field(bodyToRequest)
+      .attach('image', Buffer.from('mock file content'), 'test.png');
+
+    expect(statusCode).toBe(201);
+    expect(body).toEqual(
+      expect.objectContaining({
+        name: 'test',
+        description: 'just a test product',
+        price: 100,
+        industrialized: true,
+        ingredients: [],
       })
     );
   });
