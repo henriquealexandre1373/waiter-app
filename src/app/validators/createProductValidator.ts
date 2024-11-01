@@ -29,19 +29,10 @@ const ProductSchema = z
         .number({ required_error: 'The price is required' })
         .positive({ message: 'Price must be a positive number' })
     ),
-    category: requiredString('category').refine(isObjectId, {
+    category: z.string().refine(isObjectId, {
       message: 'The category must be a valid ObjectId',
     }),
-    ingredients: z.preprocess((ingredients) => {
-      if (typeof ingredients === 'string') {
-        try {
-          return JSON.parse(ingredients);
-        } catch {
-          return [];
-        }
-      }
-      return ingredients;
-    }, z.array(ingredientsSchema).optional().default([])),
+    ingredients: z.array(ingredientsSchema).optional().default([]),
     industrialized: z.preprocess(
       (industrialized) => industrialized === 'true' || industrialized === true,
       z.boolean().default(false)
