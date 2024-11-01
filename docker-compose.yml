@@ -2,13 +2,29 @@ services:
   app:
     build:
       context: .
-      dockerfile: dockerfile
+      dockerfile: multistage.dockerfile
+      args:
+        - APP_PORT=${PORT}
     ports:
-      - '3001:3001'
+      - '${PORT}:${PORT}'
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
+    env_file:
+      - ./env/.env
     environment:
+      - PORT=${PORT}
       - MONGO_URI=mongodb://mongo:27017/waiterApp
+      - NODE_ENV=${NODE_ENV}
+    deploy:
+      resources:
+        limits:
+          memory: 2.5GB
+        reservations:
+          memory: 512M
+    networks:
+      - app-network
+    restart: always
 
   mongo:
     image: mongo:latest
@@ -16,6 +32,25 @@ services:
       - '27017:27017'
     volumes:
       - mongo-data:/data/db
+    deploy:
+      resources:
+        limits:
+          memory: 2GB
+        reservations:
+          memory: 512MB
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'mongosh', '--eval', "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
+
+networks:
+  app-network:
+    driver: bridge
 
 volumes:
   mongo-data:
