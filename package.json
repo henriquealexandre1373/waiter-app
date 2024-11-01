@@ -6,14 +6,19 @@
   "scripts": {
     "build": "tsc",
     "dev": "nodemon  --exec ts-node -r tsconfig-paths/register src/index.ts",
-    "start:dev": "NODE_OPTIONS='--max-old-space-size=4096' nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
+    "start:dev": "nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "test": "jest --forceExit --detectOpenHandles --bail",
     "test:integration": "jest --testPathPattern=integration --runInBand --forceExit --coverage --detectOpenHandles",
     "test:unit": "jest --testPathPattern=unit --coverage --watch",
     "test:e2e": "jest --testPathPattern=e2e --runInBand --detectOpenHandles --watch-all --forceExit",
     "lint": "eslint ./src ./test --ext .ts",
     "lint:fix": "eslint ./src ./test --ext .ts --fix",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "docker:build": "docker-compose --env-file ./env/.env up --build",
+    "docker:up": "docker-compose --env-file ./env/.env up",
+    "docker:run": "docker run -dp 3000:3000 --env-file ./env/.env up",
+    "docker:down": "docker-compose --env-file ./env/.env down",
+    "docker:config": "docker-compose --env-file ./env/.env config"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
